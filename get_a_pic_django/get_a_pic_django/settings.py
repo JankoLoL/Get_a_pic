@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'get_a_pic_django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'get_a_pic_db',
+        'USER': 'postgres',
+        'PASSWORD': 'coderslab',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 
