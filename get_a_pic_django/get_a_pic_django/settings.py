@@ -119,3 +119,5 @@ try:
     from .local_settings import *
 except ImportError:
     print("Missing local_settings.py file")
+
+LOGIN_REDIRECT_URL= '/'
