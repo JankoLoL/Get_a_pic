@@ -7,14 +7,29 @@ from rest_framework.response import Response
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = UserProfile.objects.all()
+    queryset = UserProfile.objects.none()
     serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(user=self.request.user)
 
 
 class ImageViewSet(viewsets.ModelViewSet):
-    queryset = Image.objects.all()
+    queryset = Image.objects.none()
     serializer_class = ImageSerializer
     parser_classes = (MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        return Image.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+        image = Image.objects.get(pk=serializer.instance.id)
+
+        user_plan = self.request.user.profile.plan
+        for thumbnail_size in user_plan.thumbnail_sizes.all():
+            image.create_thumbnail(thumbnail_size.size)
 
     def create(self, request, *args, **kwargs):
         file_serializer = ImageSerializer(data=request.data)
