@@ -61,7 +61,11 @@ class Image(models.Model):
             raise ValueError("Invalid image format. Only JPG or PNG allowed")
 
         thumb_path = f"thumbnails/{self.id}_{size}.{file_extension}"
-        img.save(f"{settings.MEDIA_ROOT}/{thumb_path}", file_extension.upper())
+        file_format = file_extension.upper()
+        if file_format == "JPG":
+            file_format = "JPEG"
+
+        img.save(f"{settings.MEDIA_ROOT}/{thumb_path}", file_format)
         return thumb_path
 
     def __str__(self):

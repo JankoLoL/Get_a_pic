@@ -17,6 +17,7 @@ class PlanSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
     thumbnail_200 = serializers.SerializerMethodField()
     thumbnail_400 = serializers.SerializerMethodField()
 
@@ -37,7 +38,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
-    plan = PlanSerializer()
+    plan = PlanSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
