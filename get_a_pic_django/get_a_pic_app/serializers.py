@@ -25,6 +25,12 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ('id', 'user', 'image_file', 'uploaded_at', 'thumbnail_200', 'thumbnail_400')
 
+    def validate_image_file(self, value):
+        file_extension = value.name.split('.')[-1].lower()
+        if file_extension not in ['jpg', 'png']:
+            raise serializers.ValidationError("Invalid image format! Only JPG or PNG allowed")
+        return value
+
     def _get_thumbnail_url(self, obj, size):
         file_extension = obj.image_file.name.split(".")[-1].lower()
         return f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
@@ -42,7 +48,6 @@ class ImageSerializer(serializers.ModelSerializer):
         elif size == 400:
             return user_plan in ['Premium', 'Enterprise']
         return False
-
 
     def should_include_original_link(self, obj):
         user_plan = obj.user.profile.plan.name
