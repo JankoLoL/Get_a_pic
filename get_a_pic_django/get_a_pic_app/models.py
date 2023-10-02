@@ -48,21 +48,31 @@ class Image(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def create_thumbnail(self, size):
-        img = PilImage.open(self.image_file)
+        try:
+            print(f"Creating thumbnail for image{self.id}")
+            img = PilImage.open(self.image_file)
 
-        aspect = img.width / img.height
-        new_width = int(size * aspect)
+            aspect = img.width / img.height
+            new_width = int(size * aspect)
 
-        img = img.resize((new_width, size))
+            img = img.resize((new_width, size))
 
-        file_extension = self.image_file.name.split('.')[-1].lower()
+            file_extension = self.image_file.name.split('.')[-1].lower()
 
-        if file_extension not in ['jpg', 'png']:
-            raise ValueError("Invalid image format. Only JPG or PNG allowed")
+            if file_extension not in ['jpg', 'png']:
+                raise ValueError("Invalid image format. Only JPG or PNG allowed")
 
-        thumb_path = f"thumbnails/{self.id}_{size}.{file_extension}"
-        img.save(f"{settings.MEDIA_ROOT}/{thumb_path}", file_extension.upper())
-        return thumb_path
+            thumb_path = f"thumbnails/{self.id}_{size}.{file_extension}"
+            file_format = file_extension.upper()
+            if file_format == "JPG":
+                file_format = "JPEG"
+
+            img.save(f"{settings.MEDIA_ROOT}/{thumb_path}", file_format)
+            return thumb_path
+
+        except Exception as e:
+            print(f"Error creating thumbnail for image {self.id}: {str(e)}")
+        return None
 
     def __str__(self):
         return f"Image {self.id} by {self.user.username}"

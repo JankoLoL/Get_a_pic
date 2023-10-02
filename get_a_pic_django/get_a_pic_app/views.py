@@ -25,11 +25,9 @@ class ImageViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-        image = Image.objects.get(pk=serializer.instance.id)
-
         user_plan = self.request.user.profile.plan
         for thumbnail_size in user_plan.thumbnail_sizes.all():
-            image.create_thumbnail(thumbnail_size.size)
+            serializer.instance.create_thumbnail(thumbnail_size.size)
 
     def create(self, request, *args, **kwargs):
         file_serializer = ImageSerializer(data=request.data)
