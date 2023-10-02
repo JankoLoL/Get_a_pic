@@ -1,4 +1,4 @@
-from rest_framework import viewsets, views, status
+from rest_framework import viewsets, views, status, serializers
 from .models import UserProfile, Image, Plan, ThumbnailSize
 from .serializers import UserProfileSerializer, ImageSerializer, PlanSerializer, ThumbnailSizeSerializer
 from django.http import HttpResponse
@@ -23,18 +23,25 @@ class ImageViewSet(viewsets.ModelViewSet):
         return Image.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        try:
+            serializer.save(user=self.request.user)
 
-        user_plan = self.request.user.profile.plan
-        for thumbnail_size in user_plan.thumbnail_sizes.all():
-            serializer.instance.create_thumbnail(thumbnail_size.size)
+            user_plan = self.request.user.profile.plan
+            for thumbnail_size in user_plan.thumbnail_sizes.all():
+                serializer.instance.create_thumbnail(thumbnail_size.size)
+
+        except ValueError as e:
+            raise serializers.ValidationError(str(e))
 
     def create(self, request, *args, **kwargs):
         file_serializer = ImageSerializer(data=request.data)
 
         if file_serializer.is_valid():
-            self.perform_create(file_serializer)
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                self.perform_create(file_serializer)
+                return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+            except serializers.ValidationError as e:
+                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

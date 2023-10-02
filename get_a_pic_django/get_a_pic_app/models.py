@@ -49,7 +49,6 @@ class Image(models.Model):
 
     def create_thumbnail(self, size):
         try:
-            print(f"Creating thumbnail for image{self.id}")
             img = PilImage.open(self.image_file)
 
             aspect = img.width / img.height
@@ -58,9 +57,6 @@ class Image(models.Model):
             img = img.resize((new_width, size))
 
             file_extension = self.image_file.name.split('.')[-1].lower()
-
-            if file_extension not in ['jpg', 'png']:
-                raise ValueError("Invalid image format. Only JPG or PNG allowed")
 
             thumb_path = f"thumbnails/{self.id}_{size}.{file_extension}"
             file_format = file_extension.upper()
@@ -71,8 +67,7 @@ class Image(models.Model):
             return thumb_path
 
         except Exception as e:
-            print(f"Error creating thumbnail for image {self.id}: {str(e)}")
-        return None
+            raise ValueError(f"Error creating thumbnail for image {self.id}: {str(e)}")
 
     def __str__(self):
         return f"Image {self.id} by {self.user.username}"
