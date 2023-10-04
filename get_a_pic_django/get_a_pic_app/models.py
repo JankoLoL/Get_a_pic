@@ -64,6 +64,10 @@ class Image(models.Model):
                 file_format = "JPEG"
 
             img.save(f"{settings.MEDIA_ROOT}/{thumb_path}", file_format)
+
+            thumbnail_size = ThumbnailSize.objects.get(size=size)
+            Thumbnail.objects.create(image=self, thumbnail_size=thumbnail_size, file_path=thumb_path)
+
             return thumb_path
 
         except Exception as e:
@@ -71,3 +75,12 @@ class Image(models.Model):
 
     def __str__(self):
         return f"Image {self.id} by {self.user.username}"
+
+
+class Thumbnail(models.Model):
+    image = models.ForeignKey(Image, on_delete=models.CASCADE, related_name='thumbnails')
+    thumbnail_size = models.ForeignKey(ThumbnailSize, on_delete=models.CASCADE, related_name='thumbnails')
+    file_path = models.CharField(max_length=500)
+
+    def __str__(self):
+        return f"Thumbnail {self.id} of size {self.thumbnail_size} for Image {self.image.id}"
