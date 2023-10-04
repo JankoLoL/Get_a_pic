@@ -102,3 +102,42 @@ class UserProfileModelTestCase(TestCase):
         self.assertEqual(profile.plan, self.enterprise_plan)
         self.assertIn(self.size_200, profile.plan.thumbnail_sizes.all())
         self.assertIn(self.size_400, profile.plan.thumbnail_sizes.all())
+
+
+class PlanModelTestCase(TestCase):
+    def setUp(self):
+        self.thumbnail_size_200 = ThumbnailSize.objects.create(size=200)
+        self.thumbnail_size_400 = ThumbnailSize.objects.create(size=400)
+        self.plan = Plan.objects.create(name="Enterprise", has_original_image_link=True,
+                                        can_generate_expiring_link=True)
+
+    def test_plan_creation_with_name(self):
+        self.assertEqual(self.plan.name, "Enterprise")
+
+    def test_thumbnail_size_assignment(self):
+        self.plan.thumbnail_sizes.add(self.thumbnail_size_200, self.thumbnail_size_400)
+        self.assertIn(self.thumbnail_size_200, self.plan.thumbnail_sizes.all())
+        self.assertIn(self.thumbnail_size_400, self.plan.thumbnail_sizes.all())
+
+    def test_basic_plan_default_flags(self):
+        basic_plan = Plan.objects.create(name="Basic")
+        self.assertFalse(basic_plan.has_original_image_link)
+        self.assertFalse(basic_plan.can_generate_expiring_link)
+
+    def test_premium_plan_default_flags(self):
+        premium_plan = Plan.objects.create(name="Premium", has_original_image_link=True)
+        self.assertTrue(premium_plan.has_original_image_link)
+        self.assertFalse(premium_plan.can_generate_expiring_link)
+
+    def test_enterprise_plan_default_flags(self):
+        self.assertTrue(self.plan.has_original_image_link)
+        self.assertTrue(self.plan.can_generate_expiring_link)
+
+    def test_basic_plan_modifications(self):
+        basic_plan = Plan.objects.create(name="Basic")
+        basic_plan.has_original_image_link = True
+        basic_plan.can_generate_expiring_link = True
+        basic_plan.save()
+
+        self.assertTrue(basic_plan.has_original_image_link)
+        self.assertTrue(basic_plan.can_generate_expiring_link)
