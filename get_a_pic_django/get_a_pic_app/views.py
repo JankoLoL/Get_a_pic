@@ -4,11 +4,13 @@ from .serializers import UserProfileSerializer, ImageSerializer, PlanSerializer,
 from django.http import HttpResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.none()
     serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserProfile.objects.filter(user=self.request.user)
@@ -18,6 +20,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.none()
     serializer_class = ImageSerializer
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Image.objects.filter(user=self.request.user)
@@ -49,11 +52,13 @@ class ImageViewSet(viewsets.ModelViewSet):
 class PlanViewSet(viewsets.ModelViewSet):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class ThumbnailSizeViewSet(viewsets.ModelViewSet):
     queryset = ThumbnailSize.objects.all()
     serializer_class = ThumbnailSizeSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class MainPageView(views.APIView):
