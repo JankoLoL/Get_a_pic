@@ -12,6 +12,8 @@ class ImageModelTestCase(TestCase):
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.image_path = os.path.join(self.current_dir, 'test_image.jpg')
+        ThumbnailSize.objects.create(size=200)
+        ThumbnailSize.objects.create(size=400)
 
         with open(self.image_path, 'rb') as file:
             image_content = file.read()
