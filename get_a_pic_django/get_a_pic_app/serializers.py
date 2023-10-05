@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import UserProfile, Image, Plan, ThumbnailSize
+from .models import UserProfile, Image, Plan, ThumbnailSize, ExpiringLink
+from PIL import Image as PILImage
 
 
 class ThumbnailSizeSerializer(serializers.ModelSerializer):
@@ -21,6 +22,8 @@ class ImageSerializer(serializers.ModelSerializer):
     thumbnail_200 = serializers.SerializerMethodField()
     thumbnail_400 = serializers.SerializerMethodField()
 
+    image_file = serializers.ImageField(help_text="Only JPG or PNG format allowed")
+
     class Meta:
         model = Image
         fields = ('id', 'user', 'image_file', 'uploaded_at', 'thumbnail_200', 'thumbnail_400')
@@ -29,6 +32,12 @@ class ImageSerializer(serializers.ModelSerializer):
         file_extension = value.name.split('.')[-1].lower()
         if file_extension not in ['jpg', 'png']:
             raise serializers.ValidationError("Invalid image format! Only JPG or PNG allowed")
+        try:
+            image = PILImage.open(value)
+            image.verify()
+        except Exception:
+            raise serializers.ValidationError("Invalid or corrupted image")
+
         return value
 
     def _get_thumbnail_url(self, obj, size):
@@ -70,3 +79,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('user', 'plan', 'images')
+
+
+class ExpiringLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpiringLink
+        fields = ['image', 'link', 'expiration_date']
