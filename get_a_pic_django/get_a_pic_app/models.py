@@ -1,3 +1,6 @@
+import secrets
+from django.utils import timezone
+
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image as PilImage
@@ -35,11 +38,6 @@ class UserProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 class Image(models.Model):
@@ -84,3 +82,12 @@ class Thumbnail(models.Model):
 
     def __str__(self):
         return f"Thumbnail {self.id} of size {self.thumbnail_size} for Image {self.image.id}"
+
+
+class ExpiringLink(models.Model):
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    link = models.CharField(max_length=50, default=secrets.token_urlsafe, unique=True)
+    expiration_date = models.DateTimeField()
+
+    def is_expired(self):
+        return self.expiration_date < timezone.now()

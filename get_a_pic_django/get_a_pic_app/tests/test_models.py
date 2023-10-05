@@ -12,6 +12,8 @@ class ImageModelTestCase(TestCase):
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.image_path = os.path.join(self.current_dir, 'test_image.jpg')
+        ThumbnailSize.objects.create(size=200)
+        ThumbnailSize.objects.create(size=400)
 
         with open(self.image_path, 'rb') as file:
             image_content = file.read()
@@ -102,6 +104,27 @@ class UserProfileModelTestCase(TestCase):
         self.assertEqual(profile.plan, self.enterprise_plan)
         self.assertIn(self.size_200, profile.plan.thumbnail_sizes.all())
         self.assertIn(self.size_400, profile.plan.thumbnail_sizes.all())
+
+
+class UserProfileSignalTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username="testuser", password='testpassword')
+        self.plan = Plan.objects.create(name="Basic")
+
+    def test_create_user_creates_userprofile(self):
+
+        self.assertTrue(UserProfile.objects.filter(user=self.user).exists())
+
+    def test_update_user_does_not_create_new_userprofile(self):
+
+        self.assertEqual(UserProfile.objects.filter(user=self.user).count(), 1)
+
+        self.user.username = "testuserchanged"
+        self.user.save()
+
+        self.assertEqual(UserProfile.objects.filter(user=self.user).count(), 1)
+
 
 
 class PlanModelTestCase(TestCase):
