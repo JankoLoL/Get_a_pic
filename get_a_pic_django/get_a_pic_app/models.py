@@ -37,11 +37,6 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
-
-
 class Image(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="images")
     image_file = models.ImageField(upload_to="uploaded_images/")
