@@ -83,16 +83,16 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+
         if request.user.profile.plan.name != 'Enterprise':
             return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
-        try:
-            expiration_seconds = int(request.data.get('expiration_seconds', 300))
-            if not (300 <= expiration_seconds <= 3000):
-                return Response({"detail": "Invalid expiration time"}, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-            return Response({"detail": "Invalid expiration time format"}, status=status.HTTP_400_BAD_REQUEST)
 
-        image_id = request.data.get('image')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        expiration_seconds = serializer.validated_data['expiration_seconds']
+
+        image_id = serializer.validated_data.get('image').id
         try:
             image_instance = Image.objects.get(pk=image_id)
         except Image.DoesNotExist:

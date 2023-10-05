@@ -40,35 +40,41 @@ class ImageSerializer(serializers.ModelSerializer):
 
         return value
 
-    def _get_thumbnail_url(self, obj, size):
-        file_extension = obj.image_file.name.split(".")[-1].lower()
-        return f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
 
-    def get_thumbnail_200(self, obj):
-        return self._get_thumbnail_url(obj, 200) if self.should_include_thumbnail(obj, 200) else None
+def _get_thumbnail_url(self, obj, size):
+    file_extension = obj.image_file.name.split(".")[-1].lower()
+    return f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
 
-    def get_thumbnail_400(self, obj):
-        return self._get_thumbnail_url(obj, 400) if self.should_include_thumbnail(obj, 400) else None
 
-    def should_include_thumbnail(self, obj, size):
-        user_plan = obj.user.profile.plan.name
-        if size == 200:
-            return user_plan in ['Basic', 'Premium', 'Enterprise']
-        elif size == 400:
-            return user_plan in ['Premium', 'Enterprise']
-        return False
+def get_thumbnail_200(self, obj):
+    return self._get_thumbnail_url(obj, 200) if self.should_include_thumbnail(obj, 200) else None
 
-    def should_include_original_link(self, obj):
-        user_plan = obj.user.profile.plan.name
+
+def get_thumbnail_400(self, obj):
+    return self._get_thumbnail_url(obj, 400) if self.should_include_thumbnail(obj, 400) else None
+
+
+def should_include_thumbnail(self, obj, size):
+    user_plan = obj.user.profile.plan.name
+    if size == 200:
+        return user_plan in ['Basic', 'Premium', 'Enterprise']
+    elif size == 400:
         return user_plan in ['Premium', 'Enterprise']
+    return False
 
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
 
-        if not self.should_include_original_link(instance):
-            rep.pop('image_file', None)
+def should_include_original_link(self, obj):
+    user_plan = obj.user.profile.plan.name
+    return user_plan in ['Premium', 'Enterprise']
 
-        return {key: value for key, value in rep.items() if value is not None}
+
+def to_representation(self, instance):
+    rep = super().to_representation(instance)
+
+    if not self.should_include_original_link(instance):
+        rep.pop('image_file', None)
+
+    return {key: value for key, value in rep.items() if value is not None}
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -82,6 +88,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class ExpiringLinkSerializer(serializers.ModelSerializer):
+    expiration_seconds = serializers.IntegerField(
+        write_only=True,
+        required=True,
+        min_value=300,
+        max_value=30000,
+        help_text="Set expiration time in seconds (between 300 and 30000)"
+    )
+    expiration_date = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = ExpiringLink
-        fields = ['image', 'link', 'expiration_date']
+        fields = ['image', 'link', 'expiration_date', 'expiration_seconds']
