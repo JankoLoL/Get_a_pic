@@ -40,41 +40,41 @@ class ImageSerializer(serializers.ModelSerializer):
 
         return value
 
+    def _get_thumbnail_url(self, obj, size):
+        file_extension = obj.image_file.name.split(".")[-1].lower()
+        path = f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
 
-def _get_thumbnail_url(self, obj, size):
-    file_extension = obj.image_file.name.split(".")[-1].lower()
-    return f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
+        request = self.context.get('request')
+        base_url = request.build_absolute_uri('/')
 
+        full_url = base_url.rstrip('/') + path
+        return full_url
 
-def get_thumbnail_200(self, obj):
-    return self._get_thumbnail_url(obj, 200) if self.should_include_thumbnail(obj, 200) else None
+    def get_thumbnail_200(self, obj):
+        return self._get_thumbnail_url(obj, 200) if self.should_include_thumbnail(obj, 200) else None
 
+    def get_thumbnail_400(self, obj):
+        return self._get_thumbnail_url(obj, 400) if self.should_include_thumbnail(obj, 400) else None
 
-def get_thumbnail_400(self, obj):
-    return self._get_thumbnail_url(obj, 400) if self.should_include_thumbnail(obj, 400) else None
+    def should_include_thumbnail(self, obj, size):
+        user_plan = obj.user.profile.plan.name
+        if size == 200:
+            return user_plan in ['Basic', 'Premium', 'Enterprise']
+        elif size == 400:
+            return user_plan in ['Premium', 'Enterprise']
+        return False
 
-
-def should_include_thumbnail(self, obj, size):
-    user_plan = obj.user.profile.plan.name
-    if size == 200:
-        return user_plan in ['Basic', 'Premium', 'Enterprise']
-    elif size == 400:
+    def should_include_original_link(self, obj):
+        user_plan = obj.user.profile.plan.name
         return user_plan in ['Premium', 'Enterprise']
-    return False
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
 
-def should_include_original_link(self, obj):
-    user_plan = obj.user.profile.plan.name
-    return user_plan in ['Premium', 'Enterprise']
+        if not self.should_include_original_link(instance):
+            rep.pop('image_file', None)
 
-
-def to_representation(self, instance):
-    rep = super().to_representation(instance)
-
-    if not self.should_include_original_link(instance):
-        rep.pop('image_file', None)
-
-    return {key: value for key, value in rep.items() if value is not None}
+        return {key: value for key, value in rep.items() if value is not None}
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
