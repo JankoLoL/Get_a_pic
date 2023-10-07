@@ -1,4 +1,4 @@
-
+import os
 
 SECRET_KEY = 'django-insecure-)&)%sskcxrvh7hpcmx5)=&ncjzo1cp_-ind$348-xs(oemrpmq'
 
@@ -9,7 +9,7 @@ DATABASES = {
         'NAME': 'get_a_pic_db',
         'USER': 'postgres',
         'PASSWORD': 'coderslab',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5433'),
     }
 }
