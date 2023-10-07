@@ -87,7 +87,9 @@ class Thumbnail(models.Model):
 class ExpiringLink(models.Model):
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     link = models.CharField(max_length=50, default=secrets.token_urlsafe, unique=True)
-    expiration_date = models.DateTimeField()
+
+    expiration_date = models.DateTimeField(null=True)
+
 
     def is_expired(self):
         return self.expiration_date < timezone.now()

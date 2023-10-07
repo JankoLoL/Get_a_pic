@@ -42,7 +42,13 @@ class ImageSerializer(serializers.ModelSerializer):
 
     def _get_thumbnail_url(self, obj, size):
         file_extension = obj.image_file.name.split(".")[-1].lower()
-        return f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
+        path = f"/media/thumbnails/{obj.id}_{size}.{file_extension}"
+
+        request = self.context.get('request')
+        base_url = request.build_absolute_uri('/')
+
+        full_url = base_url.rstrip('/') + path
+        return full_url
 
     def get_thumbnail_200(self, obj):
         return self._get_thumbnail_url(obj, 200) if self.should_include_thumbnail(obj, 200) else None
@@ -82,6 +88,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class ExpiringLinkSerializer(serializers.ModelSerializer):
+
+    expiration_seconds = serializers.IntegerField(
+        write_only=True,
+        required=True,
+        min_value=300,
+        max_value=30000,
+        help_text="Set expiration time in seconds (between 300 and 30000)"
+    )
+    expiration_date = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = ExpiringLink
-        fields = ['image', 'link', 'expiration_date']
+        fields = ['image', 'link', 'expiration_date', 'expiration_seconds']
+

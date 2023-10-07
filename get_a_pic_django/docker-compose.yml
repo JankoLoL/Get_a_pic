@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/get_a_pic_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=get_a_pic_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=coderslab
