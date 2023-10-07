@@ -13,6 +13,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework.reverse import reverse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
@@ -94,7 +96,7 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Image with provided ID does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         token = secrets.token_urlsafe(25)
-        base_url = request._request.build_absolute_uri(reverse('retrieve_expiring_link', args=[token]))
+        base_url = reverse('expiringlink-retrieve-by-token', args=[token], request=request)
 
         new_link = ExpiringLink(
             image=image_instance,
@@ -105,9 +107,8 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
 
         return Response({"link": base_url}, status=status.HTTP_201_CREATED)
 
-
-class ExpiringLinkRetrieveView(APIView):
-    def get(self, request, token):
+    @action(detail=False, methods=['get'], url_path='retrieve/(?P<token>[^/.]+)', name='retrieve-by-token')
+    def retrieve_by_token(self, request, token=None):
         expiring_link = get_object_or_404(ExpiringLink, link=token)
 
         if expiring_link.is_expired():
@@ -116,7 +117,7 @@ class ExpiringLinkRetrieveView(APIView):
         image_path = expiring_link.image.image_file.path
         _, extension = os.path.splitext(image_path)
 
-        if extension.lower() == '.jpeg' or extension.lower() == '.jpg':
+        if extension.lower() in ['.jpeg', '.jpg']:
             content_type = 'image/jpeg'
         elif extension.lower() == '.png':
             content_type = 'image/png'
@@ -127,3 +128,26 @@ class ExpiringLinkRetrieveView(APIView):
             content = file.read()
 
         return FileResponse(io.BytesIO(content), content_type=content_type)
+
+
+# class ExpiringLinkRetrieveView(APIView):
+#     def get(self, request, token):
+#         expiring_link = get_object_or_404(ExpiringLink, link=token)
+#
+#         if expiring_link.is_expired():
+#             return Response({"detail": "Link has expired"}, status=status.HTTP_404_NOT_FOUND)
+#
+#         image_path = expiring_link.image.image_file.path
+#         _, extension = os.path.splitext(image_path)
+#
+#         if extension.lower() == '.jpeg' or extension.lower() == '.jpg':
+#             content_type = 'image/jpeg'
+#         elif extension.lower() == '.png':
+#             content_type = 'image/png'
+#         else:
+#             return Response({"detail": "Unsupported image format"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         with open(image_path, 'rb') as file:
+#             content = file.read()
+#
+#         return FileResponse(io.BytesIO(content), content_type=content_type)
