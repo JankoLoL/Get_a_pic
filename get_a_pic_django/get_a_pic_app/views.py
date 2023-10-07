@@ -47,16 +47,10 @@ class ImageViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(str(e))
 
     def create(self, request, *args, **kwargs):
-        file_serializer = ImageSerializer(data=request.data)
-
-        if file_serializer.is_valid():
-            try:
-                self.perform_create(file_serializer)
-                return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError as e:
-                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PlanViewSet(viewsets.ModelViewSet):
@@ -83,7 +77,6 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-
 
         if request.user.profile.plan.name != 'Enterprise':
             return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)

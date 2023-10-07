@@ -28,6 +28,15 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ('id', 'user', 'image_file', 'uploaded_at', 'thumbnail_200', 'thumbnail_400')
 
+    def create(self, validated_data):
+        image_instance = super().create(validated_data)
+
+        user_plan = image_instance.user.profile.plan
+        for thumbnail_size in user_plan.thumbnail_sizes.all():
+            image_instance.create_thumbnail(thumbnail_size.size)
+
+        return image_instance
+
     def validate_image_file(self, value):
         file_extension = value.name.split('.')[-1].lower()
         if file_extension not in ['jpg', 'png']:
@@ -88,7 +97,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class ExpiringLinkSerializer(serializers.ModelSerializer):
-
     expiration_seconds = serializers.IntegerField(
         write_only=True,
         required=True,
@@ -112,4 +120,3 @@ class ExpiringLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpiringLink
         fields = ['image', 'link', 'expiration_date', 'expiration_seconds']
-
