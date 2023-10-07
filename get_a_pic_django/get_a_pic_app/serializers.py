@@ -88,6 +88,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class ExpiringLinkSerializer(serializers.ModelSerializer):
+
     expiration_seconds = serializers.IntegerField(
         write_only=True,
         required=True,
@@ -100,3 +101,4 @@ class ExpiringLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpiringLink
         fields = ['image', 'link', 'expiration_date', 'expiration_seconds']
+

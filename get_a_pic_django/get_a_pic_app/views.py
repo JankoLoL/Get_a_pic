@@ -84,6 +84,7 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
 
+
         if request.user.profile.plan.name != 'Enterprise':
             return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -93,6 +94,7 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
         expiration_seconds = serializer.validated_data['expiration_seconds']
 
         image_id = serializer.validated_data.get('image').id
+
         try:
             image_instance = Image.objects.get(pk=image_id)
         except Image.DoesNotExist:
