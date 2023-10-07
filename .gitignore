@@ -1,6 +1,6 @@
 .idea/
 
-
+get_a_pic_django/local_settings.py
 
 ### Django ###
 *.log
