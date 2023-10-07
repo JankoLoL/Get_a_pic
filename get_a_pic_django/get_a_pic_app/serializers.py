@@ -98,6 +98,17 @@ class ExpiringLinkSerializer(serializers.ModelSerializer):
     )
     expiration_date = serializers.DateTimeField(read_only=True)
 
+    image = serializers.PrimaryKeyRelatedField(
+        queryset=Image.objects.none()
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            self.fields['image'].queryset = Image.objects.filter(user=request.user)
+
     class Meta:
         model = ExpiringLink
         fields = ['image', 'link', 'expiration_date', 'expiration_seconds']

@@ -11,7 +11,7 @@ from .serializers import UserProfileSerializer, ImageSerializer, PlanSerializer,
 from django.http import HttpResponse, FileResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -62,13 +62,13 @@ class ImageViewSet(viewsets.ModelViewSet):
 class PlanViewSet(viewsets.ModelViewSet):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
 
 class ThumbnailSizeViewSet(viewsets.ModelViewSet):
     queryset = ThumbnailSize.objects.all()
     serializer_class = ThumbnailSizeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
 
 class MainPageView(views.APIView):
