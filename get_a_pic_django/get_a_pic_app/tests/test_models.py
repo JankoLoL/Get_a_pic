@@ -113,18 +113,15 @@ class UserProfileSignalTest(TestCase):
         self.plan = Plan.objects.create(name="Basic")
 
     def test_create_user_creates_userprofile(self):
-
         self.assertTrue(UserProfile.objects.filter(user=self.user).exists())
 
     def test_update_user_does_not_create_new_userprofile(self):
-
         self.assertEqual(UserProfile.objects.filter(user=self.user).count(), 1)
 
         self.user.username = "testuserchanged"
         self.user.save()
 
         self.assertEqual(UserProfile.objects.filter(user=self.user).count(), 1)
-
 
 
 class PlanModelTestCase(TestCase):

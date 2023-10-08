@@ -2,9 +2,8 @@ import io
 import os.path
 import secrets
 from datetime import timedelta
-
 from django.urls import reverse
-from rest_framework import viewsets, views, status, serializers
+from rest_framework import viewsets, views, status
 from .models import UserProfile, Image, Plan, ThumbnailSize, ExpiringLink
 from .serializers import UserProfileSerializer, ImageSerializer, PlanSerializer, \
     ThumbnailSizeSerializer, ExpiringLinkSerializer
@@ -35,17 +34,6 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Image.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        try:
-            serializer.save(user=self.request.user)
-
-            user_plan = self.request.user.profile.plan
-            for thumbnail_size in user_plan.thumbnail_sizes.all():
-                serializer.instance.create_thumbnail(thumbnail_size.size)
-
-        except ValueError as e:
-            raise serializers.ValidationError(str(e))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -128,4 +116,3 @@ class ExpiringLinkViewSet(viewsets.ModelViewSet):
             content = file.read()
 
         return FileResponse(io.BytesIO(content), content_type=content_type)
-

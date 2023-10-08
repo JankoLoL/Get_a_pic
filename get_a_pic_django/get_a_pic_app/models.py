@@ -90,6 +90,5 @@ class ExpiringLink(models.Model):
 
     expiration_date = models.DateTimeField(null=True)
 
-
     def is_expired(self):
         return self.expiration_date < timezone.now()

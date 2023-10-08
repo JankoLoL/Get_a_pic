@@ -15,5 +15,4 @@ urlpatterns = [
     path('', MainPageView.as_view(), name='main-page'),
     path('api/', include(router.urls)),
     path('login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'),
-    # path('expiring-link/<str:token>/', ExpiringLinkRetrieveView.as_view(), name='retrieve_expiring_link'),
 ]
