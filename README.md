@@ -1,4 +1,4 @@
-## README.md for the get_a_pic_app
+## README for the get_a_pic_app
 
 ### Description:
 
@@ -27,6 +27,15 @@ This application is built using the Django REST Framework and allows users to up
     - Ability to generate expiring links.
 5. **Admin UI**: Managed via `django-admin`.
 6. **User Interface**: There's no custom user UI, just the browsable API from Django Rest Framework.
+7. **Admin Customizations**: Administrators have the ability to define new thumbnail sizes and create new account plans.
+Flexibility and Adjustments:
+While the application provides administrators with the flexibility to define new thumbnail sizes and create new account
+plans beyond the default ones, it's important to note:
+
+***Code Adjustments***: Introducing new plans or thumbnail sizes that differ from the default specifications
+might necessitate changes or optimizations in the application's code to ensure optimal performance and functionality.
+Always test thoroughly when introducing changes to the application's settings or behaviors.
+
 
 ### Considerations:
 
