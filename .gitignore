@@ -3,6 +3,7 @@
 get_a_pic_django/local_settings.py
 
 get_a_pic_venv
+
 ### Django ###
 *.log
 *.pot
