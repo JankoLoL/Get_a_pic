@@ -12,7 +12,7 @@ class MainPageViewTest(TestCase):
         client = APIClient()
         response = client.get(reverse('main-page'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf-8'), "Welcome on main page")
+        self.assertEqual(response.content.decode('utf-8'), "<h1>Welcome on main page!</h1>")
 
 
 class UserProfileViewSetTest(TestCase):
@@ -36,7 +36,7 @@ class UserProfileViewSetTest(TestCase):
 class PlanViewSetTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_superuser(username='adminuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
         self.plan = Plan.objects.create(name="Basic")
 
@@ -50,8 +50,9 @@ class ThumbnailSizeViewSetTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.thumbnail_size = ThumbnailSize.objects.create(size=200)
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_superuser(username='adminuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
+        self.user.profile.save()
 
     def test_get_thumbnail_sizes(self):
         response = self.client.get(reverse('thumbnailsize-list'))
@@ -103,14 +104,8 @@ class ImageViewSetTest(TestCase):
     def test_upload_without_permission(self):
         self.client.logout()
         response = self.client.post(reverse('image-list'), {'image-file': self.image_file}, format='multipart')
+        self.assertEqual(response.status_code, 403)
 
     def test_upload_wrong_type(self):
         response = self.client.post(reverse('image-list'), {'image-file': self.image_file}, format='multipart')
         self.assertEqual(response.status_code, 400)
-
-    # def test_thumbnails_created_after_upload(self):
-    #     response = self.client.post(reverse('image-list'), {'image_file': self.image_file}, format='multipart')
-    #     self.assertEqual(response.status_code, 201)
-    #     user_profile =
-    #     uploaded_image = Plan.thumbnail_sizes(p)
-    #     self.assertTrue(uploaded_image.thumbnails.exists())
