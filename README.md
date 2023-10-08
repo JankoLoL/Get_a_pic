@@ -34,10 +34,6 @@ This application is built using the Django REST Framework and allows users to up
 - **Validation**: Proper validation of image types and sizes.
 - **Performance**: Designed with scalability in mind. Anticipate heavy traffic and large numbers of image uploads.
 
-Certainly! Below is an expanded section of the README that describes the functionality associated with each endpoint in
-your `urls.py`.
-
-
 ---
 
 ## Endpoints and Their Functions:
@@ -52,7 +48,7 @@ your `urls.py`.
    **User Profiles**:
     - Local URL: `http://localhost:8000/api/userprofile/`
     - Docker URL: `http://0.0.0.0:8000/api/userprofile/`
-    - Description: Endpoints for creating, retrieving, updating, and deleting user profiles.
+    - Description: List user profile details.
 
    **Images**:
     - Local URL: `http://localhost:8000/api/images/`
@@ -62,18 +58,17 @@ your `urls.py`.
    **Plans**:
     - Local URL: `http://localhost:8000/api/plans/`
     - Docker URL: `http://0.0.0.0:8000/api/plans/`
-    - Description: Endpoints for creating, retrieving, updating, and deleting account plans (Basic, Premium, Enterprise,
-      etc.).
+    - Description: Endpoint for creating new account plans. Available only for administrator.
 
    **Thumbnail Sizes**:
     - Local URL: `http://localhost:8000/api/thumbnail-sizes/`
     - Docker URL: `http://0.0.0.0:8000/api/thumbnail-sizes/`
-    - Description: Endpoints for defining, retrieving, updating, and deleting thumbnail sizes.
+    - Description: Endpoint for defining and adding thumbnail sizes. Available only for administrator.
 
    **Expiring Links**:
     - Local URL: `http://localhost:8000/api/expiring-link/`
     - Docker URL: `http://0.0.0.0:8000/api/expiring-link/`
-    - Description: Endpoints to generate and manage expiring links for images.
+    - Description: Endpoints to generate and manage expiring links for images. Only for Enterprise user and admin.
 
 3. **Login Page**:
     - Local URL: `http://localhost:8000/login/`
@@ -81,10 +76,9 @@ your `urls.py`.
     - Description: The login page for users to authenticate themselves.
 
 4. **Retrieve Expiring Link**:
-    - Local URL: `http://localhost:8000/expiring-link/<str:token>/`
-    - Docker URL: `http://0.0.0.0:8000/expiring-link/<str:token>/`
-    - Description: Endpoint to retrieve the actual image or content associated with an expiring link using a given
-      token.
+    - Local URL: `http://localhost:8000/expiring-link/`
+    - Docker URL: `http://0.0.0.0:8000/expiring-link/`
+    - Description: Endpoint to create an expiring link using a given token.
 
 ---
 
@@ -146,8 +140,7 @@ To set up and run the application locally, follow the steps below:
    #### Admin Panel. Navigate to:
 
     - Local URL: `http://localhost:8000/admin/`
-    - Docker URL: `http://0.0.0.0:8000/admin/`  
-     
+    - Docker URL: `http://0.0.0.0:8000/admin/`
 
 and use the superuser credentials you created
 
@@ -203,4 +196,7 @@ The `local_settings.py` file allows you to:
            'PORT': '5432',
        }
    }
+   
+
+
 ### Author: Adam Chrzanowski
