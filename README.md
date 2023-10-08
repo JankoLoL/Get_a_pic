@@ -58,12 +58,12 @@ This application is built using the Django REST Framework and allows users to up
    **Plans**:
     - Local URL: `http://localhost:8000/api/plans/`
     - Docker URL: `http://0.0.0.0:8000/api/plans/`
-    - Description: Endpoint for creating new account plans. Available only for administrator.
+    - Description: Endpoint for creating new account plans. Available only to administrator.
 
    **Thumbnail Sizes**:
     - Local URL: `http://localhost:8000/api/thumbnail-sizes/`
     - Docker URL: `http://0.0.0.0:8000/api/thumbnail-sizes/`
-    - Description: Endpoint for defining and adding thumbnail sizes. Available only for administrator.
+    - Description: Endpoint for defining and adding thumbnail sizes. Available only to administrator.
 
    **Expiring Links**:
     - Local URL: `http://localhost:8000/api/expiring-link/`
