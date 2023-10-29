@@ -53,8 +53,7 @@ class UserModelTestCase(TestCase):
         self.assertIsNotNone(self.user.profile)
 
     def test_user_is_authenticated(self):
-        user = self.user
-        self.assertTrue(user.is_authenticated)
+        self.assertTrue(self.user.is_authenticated)
 
     def test_username_uniqueness(self):
         with self.assertRaises(IntegrityError):
@@ -69,6 +68,7 @@ class UserProfileModelTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.profile = self.user.profile
         self.size_200 = ThumbnailSize.objects.create(size=200)
         self.size_400 = ThumbnailSize.objects.create(size=400)
 
@@ -88,6 +88,8 @@ class UserProfileModelTestCase(TestCase):
         profile.save()
         self.assertEqual(profile.plan, self.basic_plan)
         self.assertIn(self.size_200, profile.plan.thumbnail_sizes.all())
+        self.assertFalse(profile.plan.has_original_image_link)
+        self.assertFalse(profile.plan.can_generate_expiring_link)
 
     def test_premium_plan_assignment(self):
         profile = self.user.profile
@@ -96,6 +98,8 @@ class UserProfileModelTestCase(TestCase):
         self.assertEqual(profile.plan, self.premium_plan)
         self.assertIn(self.size_200, profile.plan.thumbnail_sizes.all())
         self.assertIn(self.size_400, profile.plan.thumbnail_sizes.all())
+        self.assertTrue(profile.plan.has_original_image_link)
+        self.assertFalse(profile.plan.can_generate_expiring_link)
 
     def test_enterprise_plan_assigment(self):
         profile = self.user.profile
@@ -104,6 +108,8 @@ class UserProfileModelTestCase(TestCase):
         self.assertEqual(profile.plan, self.enterprise_plan)
         self.assertIn(self.size_200, profile.plan.thumbnail_sizes.all())
         self.assertIn(self.size_400, profile.plan.thumbnail_sizes.all())
+        self.assertTrue(profile.plan.has_original_image_link)
+        self.assertTrue(profile.plan.can_generate_expiring_link)
 
 
 class UserProfileSignalTest(TestCase):

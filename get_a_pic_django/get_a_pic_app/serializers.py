@@ -42,6 +42,7 @@ class ImageSerializer(serializers.ModelSerializer):
         if file_extension not in ['jpg', 'png']:
             raise serializers.ValidationError("Invalid image format! Only JPG or PNG allowed")
         try:
+
             image = PILImage.open(value)
             image.verify()
         except Exception:
