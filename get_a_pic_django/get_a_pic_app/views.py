@@ -57,7 +57,15 @@ class ThumbnailSizeViewSet(viewsets.ModelViewSet):
 class MainPageView(views.APIView):
 
     def get(self, request):
-        content = "<h1>Welcome on main page!</h1>"
+        content = """
+                <html>
+                    <body>
+                        <h1>Welcome to "get_a_pic" API</h1>
+                        <a href="/api"><button>Main API</button></a>
+                        <a href="/login"><button>Login</button></a>
+                    </body>
+                </html>
+                """
         return HttpResponse(content, content_type='text/html')
 
 
